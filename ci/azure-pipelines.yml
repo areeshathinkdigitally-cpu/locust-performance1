@@ -1,0 +1,36 @@
+trigger:
+- main
+
+pool:
+  vmImage: "ubuntu-latest"
+
+variables:
+  TARGET_HOST: "https://YOUR_BASE_URL"
+  LOCUST_USERS_CSV: "data/users.example.csv"
+  LOCUST_FAIL_RATIO_MAX: "0.01"
+  LOCUST_P95_MAX_MS: "1200"
+
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: "3.11"
+
+- script: |
+    python -m pip install --upgrade pip
+    pip install -r requirements.txt
+  displayName: "Install dependencies"
+
+- script: |
+    mkdir -p reports
+    locust -f weeks/week7_8_scaling_ci.py       --headless -t 10m -u 100 -r 10       --host "$(TARGET_HOST)"       --html reports/locust_report.html       --csv reports/locust
+  displayName: "Run Locust headless"
+
+- script: |
+    python scripts/check_thresholds.py reports/locust_stats.csv
+  displayName: "Quality gate (p95 + fail ratio)"
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathToPublish: "reports"
+    artifactName: "locust-reports"
+  displayName: "Publish reports"
