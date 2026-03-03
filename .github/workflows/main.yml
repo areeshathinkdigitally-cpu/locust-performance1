@@ -1,7 +1,7 @@
 name: locust-performance
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "master" ]
   workflow_dispatch:
   schedule:
     - cron: "0 2 * * 1"  # Mondays 02:00 UTC (example)
