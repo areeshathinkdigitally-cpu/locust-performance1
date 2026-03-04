@@ -28,10 +28,20 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install deps
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+      - name: Debug - list files (1 time)
+  run: |
+    pwd
+    ls -la
+    ls -la weeks
+    ls -la scripts
+    cat requirements.txt
+
+- name: Install deps
+  run: |
+    python -V
+    python -m pip --version
+    python -m pip install --upgrade pip
+    python -m pip install -r requirements.txt
 
       - name: Run Locust (headless)
         run: |
