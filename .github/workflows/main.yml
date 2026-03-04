@@ -2,7 +2,7 @@ name: Locust Performance CI
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
   workflow_dispatch: {}
 
 permissions:
@@ -23,25 +23,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Debug - list files (1 time)
+        run: |
+          pwd
+          ls -la
+          ls -la weeks
+          ls -la scripts
+          cat requirements.txt
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Debug - list files (1 time)
-  run: |
-    pwd
-    ls -la
-    ls -la weeks
-    ls -la scripts
-    cat requirements.txt
-
-- name: Install deps
-  run: |
-    python -V
-    python -m pip --version
-    python -m pip install --upgrade pip
-    python -m pip install -r requirements.txt
+      - name: Install deps
+        run: |
+          python -V
+          python -m pip --version
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
 
       - name: Run Locust (headless)
         run: |
@@ -56,7 +56,6 @@ jobs:
         run: |
           python scripts/check_thresholds.py reports/locust_stats.csv
 
-      # This prepares the folder for Pages deploy
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
