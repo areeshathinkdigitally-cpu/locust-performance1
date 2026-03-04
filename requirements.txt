@@ -32,7 +32,7 @@ Pygments==2.19.2
 pytest==9.0.2
 python-engineio==4.12.3
 python-socketio==5.15.0
-pywin32==311
+pywin32==311; platform_system == "Windows"
 pyzmq==27.1.0
 requests==2.32.4
 simple-websocket==1.1.0
