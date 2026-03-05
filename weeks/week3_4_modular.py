@@ -1,11 +1,4 @@
-"""
-WEEK 3-4: Writing and Structuring Locust Scripts
-Goals demonstrated in this file:
-- Modular & reusable code (POM-like ApiClient)
-- Multiple tasks (signin + get_users) to model workflow
-- Wait time + task weights (realistic behavior mix)
-- Manual pass/fail control via catch_response (basic error-rate analysis)
-"""
+
 
 import logging
 from locust import HttpUser, task, between

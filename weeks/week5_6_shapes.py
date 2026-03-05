@@ -1,10 +1,3 @@
-"""
-WEEK 5-6: Advanced Load Testing Concepts
-Goals demonstrated in this file:
-- Different load types: ramp, spike, stress (selected by env var)
-- Custom LoadTestShape classes to control load programmatically
-- Optional local resource monitoring (CPU/RAM) to correlate with load
-"""
 
 import logging
 from locust import HttpUser, task, between
