@@ -1,0 +1,9 @@
+====# Python
+__pycache__/
+*.pyc
+# Locust generated outputs
+reports/
+
+# IDE / Virtualenv
+.venv/
+.idea/

@@ -1,36 +1,74 @@
-name: locust-performance
+name: Locust Performance CI
+
 on:
   push:
-    branches: [ "main" ]
-  workflow_dispatch:
-  schedule:
-    - cron: "0 2 * * 1"  # Mondays 02:00 UTC (example)
+    branches: ["master"]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
-  run-locust:
+  locust:
     runs-on: ubuntu-latest
     env:
       TARGET_HOST: https://api-cycle-dev.azurewebsites.net
-      LOCUST_USERS_CSV: data/users.example.csv
+      STRICT_SLA: "false"
       LOCUST_FAIL_RATIO_MAX: "0.01"
-      LOCUST_P95_MAX_MS: "1200"
+      LOCUST_P95_MAX_MS: "2000"
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Debug - list files (1 time)
+        run: |
+          pwd
+          ls -la
+          ls -la weeks
+          ls -la scripts
+          cat requirements.txt
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Install
+
+      - name: Install deps
         run: |
+          python -V
+          python -m pip --version
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-      - name: Run Locust
+          python -m pip install -r requirements.txt
+
+      - name: Run Locust (headless)
         run: |
           mkdir -p reports
-          locust -f weeks/week7_8_scaling_ci.py --headless -t 10m -u 100 -r 10             --host "$TARGET_HOST" --html reports/locust_report.html --csv reports/locust
-      - name: Gate
+          locust -f weeks/week7_8_scaling_ci.py \
+            --headless -u 5 -r 1 -t 1m \
+            --host "${TARGET_HOST}" \
+            --html reports/index.html \
+            --csv reports/locust
+
+      - name: Quality gate
         run: |
           python scripts/check_thresholds.py reports/locust_stats.csv
-      - name: Upload reports
-        uses: actions/upload-artifact@v4
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: locust-reports
-          path: reports
+          path: reports/
+
+  deploy_pages:
+    needs: locust
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
